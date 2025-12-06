@@ -121,11 +121,15 @@ export function createResolvers(db, env) {
           const dateAdded = input.dateAdded || new Date().toISOString();
           const dateModified = new Date().toISOString();
 
-          // Get user ID from auth token (optional - recipes can be created without auth)
+          // Require authentication to create recipes
           const userId = await getUserFromToken(
             context.request.headers.get('Authorization'),
             env.JWT_SECRET
           );
+
+          if (!userId) {
+            throw new Error('Authentication required');
+          }
 
           await db.prepare(`
             INSERT INTO recipes (
@@ -151,7 +155,7 @@ export function createResolvers(db, env) {
             input.source || '',
             dateAdded,
             dateModified,
-            userId || null
+            userId
           ).run();
 
           return {

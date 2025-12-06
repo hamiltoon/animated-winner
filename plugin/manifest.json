@@ -1,14 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Recipe Saver",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Extract and save recipes from web pages",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "identity"
   ],
   "host_permissions": [
-    "http://localhost:4000/*"
+    "https://recipe-saver-api.hamiltoon.workers.dev/*",
+    "https://github.com/*"
   ],
   "action": {
     "default_popup": "popup.html"
@@ -18,5 +20,9 @@
       "matches": ["<all_urls>"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "oauth2": {
+    "client_id": "Ov23linhqwiqRIB7923L.chromiumapp.org",
+    "scopes": ["user:email"]
+  }
 }

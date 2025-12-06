@@ -7,8 +7,21 @@
 </head>
 <body>
   <div class="container">
-    <div id="mainView">
+    <div id="authView" class="hidden">
       <h1>Recipe Saver</h1>
+      <p>Please sign in to save and view recipes</p>
+      <button id="signInBtn" class="primary-btn">Sign in with GitHub</button>
+      <div id="authStatus" class="status"></div>
+    </div>
+
+    <div id="mainView" class="hidden">
+      <div class="auth-header">
+        <h1>Recipe Saver</h1>
+        <div class="user-info">
+          <span id="userName"></span>
+          <button id="signOutBtn" class="secondary-btn">Sign Out</button>
+        </div>
+      </div>
       <button id="extractRecipe" class="primary-btn">Save Recipe from Page</button>
       <div id="status" class="status"></div>
 
@@ -37,6 +50,7 @@
 
   <input type="file" id="importFile" accept=".json" style="display: none;">
 
+  <script src="auth.js"></script>
   <script src="storage.js"></script>
   <script src="popup.js"></script>
 </body>

@@ -18,6 +18,34 @@ h1 {
   text-align: center;
 }
 
+.auth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.auth-header h1 {
+  margin: 0;
+  text-align: left;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+#authView {
+  text-align: center;
+}
+
+#authView p {
+  margin: 16px 0;
+  color: #5f6368;
+}
+
 h2 {
   color: #202124;
   font-size: 14px;

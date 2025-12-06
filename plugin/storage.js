@@ -7,11 +7,19 @@ const RecipeStorage = {
   // Helper function to make GraphQL calls
   async graphqlCall(query, variables = {}) {
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      // Add auth token if available
+      const token = Auth.getToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(GRAPHQL_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           query,
           variables,

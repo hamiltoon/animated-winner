@@ -3,8 +3,13 @@
 let currentRecipeId = null;
 
 // DOM elements
+const authView = document.getElementById("authView");
 const mainView = document.getElementById("mainView");
 const recipeView = document.getElementById("recipeView");
+const signInBtn = document.getElementById("signInBtn");
+const signOutBtn = document.getElementById("signOutBtn");
+const userName = document.getElementById("userName");
+const authStatus = document.getElementById("authStatus");
 const extractBtn = document.getElementById("extractRecipe");
 const statusDiv = document.getElementById("status");
 const recipeList = document.getElementById("recipeList");
@@ -18,12 +23,47 @@ const recipeDetails = document.getElementById("recipeDetails");
 const deleteRecipeBtn = document.getElementById("deleteRecipeBtn");
 
 // Initialize popup
-document.addEventListener("DOMContentLoaded", function () {
-  loadRecipes();
+document.addEventListener("DOMContentLoaded", async function () {
+  await initializeAuth();
   setupEventListeners();
 });
 
+// Initialize authentication
+async function initializeAuth() {
+  if (Auth.isAuthenticated()) {
+    try {
+      const user = await Auth.getCurrentUser();
+      if (user) {
+        showMainView(user);
+      } else {
+        showAuthView();
+      }
+    } catch (error) {
+      console.error('Error loading user:', error);
+      showAuthView();
+    }
+  } else {
+    showAuthView();
+  }
+}
+
+function showAuthView() {
+  authView.classList.remove('hidden');
+  mainView.classList.add('hidden');
+  recipeView.classList.add('hidden');
+}
+
+function showMainView(user) {
+  authView.classList.add('hidden');
+  mainView.classList.remove('hidden');
+  recipeView.classList.add('hidden');
+  userName.textContent = user.username;
+  loadRecipes();
+}
+
 function setupEventListeners() {
+  signInBtn.addEventListener("click", handleSignIn);
+  signOutBtn.addEventListener("click", handleSignOut);
   extractBtn.addEventListener("click", extractRecipeFromPage);
   searchInput.addEventListener("input", handleSearch);
   exportBtn.addEventListener("click", exportRecipes);
@@ -31,6 +71,27 @@ function setupEventListeners() {
   importFile.addEventListener("change", importRecipes);
   backBtn.addEventListener("click", () => showView("main"));
   deleteRecipeBtn.addEventListener("click", deleteCurrentRecipe);
+}
+
+async function handleSignIn() {
+  try {
+    authStatus.textContent = 'Signing in...';
+    authStatus.className = 'status info';
+    signInBtn.disabled = true;
+
+    const user = await Auth.login();
+    showMainView(user);
+  } catch (error) {
+    console.error('Sign in error:', error);
+    authStatus.textContent = `Error: ${error.message}`;
+    authStatus.className = 'status error';
+    signInBtn.disabled = false;
+  }
+}
+
+function handleSignOut() {
+  Auth.logout();
+  showAuthView();
 }
 
 // Extract recipe from current page
