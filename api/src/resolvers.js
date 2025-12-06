@@ -1,13 +1,42 @@
 // GraphQL Resolvers for Cloudflare D1
 // Cloudflare D1 uses async/await API instead of sql.js's synchronous API
 
+import { getUserFromToken } from './auth.js';
+
 // Helper function to generate unique ID
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
 
-export function createResolvers(db) {
+export function createResolvers(db, env) {
   return {
+    Recipe: {
+      user: async (parent) => {
+        if (!parent.user_id) {
+          return null;
+        }
+
+        const result = await db
+          .prepare('SELECT * FROM users WHERE id = ?')
+          .bind(parent.user_id)
+          .first();
+
+        if (!result) {
+          return null;
+        }
+
+        return {
+          id: result.id,
+          githubId: result.github_id,
+          username: result.username,
+          email: result.email,
+          avatarUrl: result.avatar_url,
+          name: result.name,
+          createdAt: result.created_at,
+          lastLogin: result.last_login,
+        };
+      },
+    },
     Query: {
       health: () => 'Recipe Saver GraphQL API is running on Cloudflare Workers',
 
@@ -66,18 +95,24 @@ export function createResolvers(db) {
     },
 
     Mutation: {
-      createRecipe: async (_, { input }) => {
+      createRecipe: async (_, { input }, context) => {
         try {
           const id = input.id || generateId();
           const dateAdded = input.dateAdded || new Date().toISOString();
           const dateModified = new Date().toISOString();
 
+          // Get user ID from auth token (optional - recipes can be created without auth)
+          const userId = await getUserFromToken(
+            context.request.headers.get('Authorization'),
+            env.JWT_SECRET
+          );
+
           await db.prepare(`
             INSERT INTO recipes (
               id, title, description, ingredients, instructions,
               prepTime, cookTime, totalTime, servings, category,
-              cuisine, image, author, url, source, dateAdded, dateModified
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              cuisine, image, author, url, source, dateAdded, dateModified, user_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `).bind(
             id,
             input.title || '',
@@ -95,7 +130,8 @@ export function createResolvers(db) {
             input.url || '',
             input.source || '',
             dateAdded,
-            dateModified
+            dateModified,
+            userId || null
           ).run();
 
           return {
@@ -106,6 +142,7 @@ export function createResolvers(db) {
               id,
               dateAdded,
               dateModified,
+              userId,
             },
           };
         } catch (error) {

@@ -1,3 +1,14 @@
+type User {
+  id: ID!
+  githubId: String!
+  username: String!
+  email: String
+  avatarUrl: String
+  name: String
+  createdAt: String!
+  lastLogin: String!
+}
+
 type Recipe {
   id: ID!
   title: String!
@@ -16,6 +27,8 @@ type Recipe {
   source: String
   dateAdded: String!
   dateModified: String
+  userId: String
+  user: User
 }
 
 input RecipeInput {
@@ -73,6 +86,13 @@ type Stats {
   cuisines: [String!]!
 }
 
+type AuthResponse {
+  success: Boolean!
+  token: String
+  user: User
+  error: String
+}
+
 type Query {
   # Get all recipes
   recipes: [Recipe!]!
@@ -86,11 +106,17 @@ type Query {
   # Get statistics
   stats: Stats!
 
+  # Get current user (requires authentication)
+  me: User
+
   # Health check
   health: String!
 }
 
 type Mutation {
+  # Authenticate with GitHub OAuth code
+  authenticateGitHub(code: String!): AuthResponse!
+
   # Create a new recipe
   createRecipe(input: RecipeInput!): RecipeResponse!
 

@@ -3,6 +3,17 @@ import { createSchema as makeExecutableSchema } from 'graphql-yoga';
 
 // GraphQL type definitions (inlined to avoid fs dependency)
 const typeDefs = `#graphql
+  type User {
+    id: ID!
+    githubId: String!
+    username: String!
+    email: String
+    avatarUrl: String
+    name: String
+    createdAt: String!
+    lastLogin: String!
+  }
+
   type Recipe {
     id: ID!
     title: String!
@@ -21,6 +32,8 @@ const typeDefs = `#graphql
     source: String
     dateAdded: String!
     dateModified: String
+    userId: String
+    user: User
   }
 
   input RecipeInput {
@@ -78,15 +91,24 @@ const typeDefs = `#graphql
     cuisines: [String!]!
   }
 
+  type AuthResponse {
+    success: Boolean!
+    token: String
+    user: User
+    error: String
+  }
+
   type Query {
     recipes: [Recipe!]!
     recipe(id: ID!): Recipe
     searchRecipes(query: String!): [Recipe!]!
     stats: Stats!
+    me: User
     health: String!
   }
 
   type Mutation {
+    authenticateGitHub(code: String!): AuthResponse!
     createRecipe(input: RecipeInput!): RecipeResponse!
     updateRecipe(id: ID!, input: RecipeUpdateInput!): RecipeResponse!
     deleteRecipe(id: ID!): RecipeResponse!

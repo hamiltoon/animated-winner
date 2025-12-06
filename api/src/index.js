@@ -2,12 +2,33 @@
 import { createYoga } from 'graphql-yoga';
 import { createSchema } from './schema.js';
 import { createResolvers } from './resolvers.js';
+import { createAuthResolvers } from './auth-resolvers.js';
+
+// Merge resolvers helper
+function mergeResolvers(...resolverObjects) {
+  const merged = {};
+  for (const resolvers of resolverObjects) {
+    for (const [type, fields] of Object.entries(resolvers)) {
+      if (!merged[type]) {
+        merged[type] = {};
+      }
+      Object.assign(merged[type], fields);
+    }
+  }
+  return merged;
+}
 
 export default {
   async fetch(request, env, ctx) {
+    // Merge recipe and auth resolvers
+    const resolvers = mergeResolvers(
+      createResolvers(env.DB, env),
+      createAuthResolvers(env.DB, env)
+    );
+
     // Create GraphQL Yoga instance
     const yoga = createYoga({
-      schema: createSchema(createResolvers(env.DB)),
+      schema: createSchema(resolvers),
 
       // Enable GraphiQL playground in development
       graphiql: env.ENVIRONMENT !== 'production',
