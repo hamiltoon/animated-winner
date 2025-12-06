@@ -1,5 +1,4 @@
-const API_URL = 'https://recipe-saver-api.hamiltoon.workers.dev/graphql';
-
+// API_URL is defined in auth.js
 let allRecipes = [];
 let filteredRecipes = [];
 
