@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Recipe Saver",
+  "version": "1.0",
+  "description": "Extract and save recipes from web pages",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://localhost:4000/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}

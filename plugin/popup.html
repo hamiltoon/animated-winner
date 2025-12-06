@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Recipe Saver</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div id="mainView">
+      <h1>Recipe Saver</h1>
+      <button id="extractRecipe" class="primary-btn">Save Recipe from Page</button>
+      <div id="status" class="status"></div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>My Recipes (<span id="recipeCount">0</span>)</h2>
+        <input type="text" id="searchInput" placeholder="Search recipes...">
+        <div id="recipeList" class="recipe-list"></div>
+      </div>
+
+      <div class="actions">
+        <button id="exportBtn" class="secondary-btn">Export All</button>
+        <button id="importBtn" class="secondary-btn">Import</button>
+      </div>
+    </div>
+
+    <div id="recipeView" class="hidden">
+      <button id="backBtn" class="back-btn">← Back</button>
+      <div id="recipeDetails"></div>
+      <div class="recipe-actions">
+        <button id="deleteRecipeBtn" class="danger-btn">Delete Recipe</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="importFile" accept=".json" style="display: none;">
+
+  <script src="storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
