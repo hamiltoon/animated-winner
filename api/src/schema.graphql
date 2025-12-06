@@ -1,0 +1,105 @@
+type Recipe {
+  id: ID!
+  title: String!
+  description: String
+  ingredients: [String!]!
+  instructions: [String!]!
+  prepTime: String
+  cookTime: String
+  totalTime: String
+  servings: String
+  category: String
+  cuisine: String
+  image: String
+  author: String
+  url: String
+  source: String
+  dateAdded: String!
+  dateModified: String
+}
+
+input RecipeInput {
+  id: ID
+  title: String!
+  description: String
+  ingredients: [String!]!
+  instructions: [String!]!
+  prepTime: String
+  cookTime: String
+  totalTime: String
+  servings: String
+  category: String
+  cuisine: String
+  image: String
+  author: String
+  url: String
+  source: String
+  dateAdded: String
+}
+
+input RecipeUpdateInput {
+  title: String
+  description: String
+  ingredients: [String!]
+  instructions: [String!]
+  prepTime: String
+  cookTime: String
+  totalTime: String
+  servings: String
+  category: String
+  cuisine: String
+  image: String
+  author: String
+  url: String
+  source: String
+}
+
+type RecipeResponse {
+  success: Boolean!
+  id: ID
+  recipe: Recipe
+  error: String
+}
+
+type ImportResponse {
+  success: Boolean!
+  imported: Int!
+  error: String
+}
+
+type Stats {
+  totalRecipes: Int!
+  categories: [String!]!
+  cuisines: [String!]!
+}
+
+type Query {
+  # Get all recipes
+  recipes: [Recipe!]!
+
+  # Get a single recipe by ID
+  recipe(id: ID!): Recipe
+
+  # Search recipes by query
+  searchRecipes(query: String!): [Recipe!]!
+
+  # Get statistics
+  stats: Stats!
+
+  # Health check
+  health: String!
+}
+
+type Mutation {
+  # Create a new recipe
+  createRecipe(input: RecipeInput!): RecipeResponse!
+
+  # Update an existing recipe
+  updateRecipe(id: ID!, input: RecipeUpdateInput!): RecipeResponse!
+
+  # Delete a recipe
+  deleteRecipe(id: ID!): RecipeResponse!
+
+  # Import multiple recipes
+  importRecipes(recipes: [RecipeInput!]!): ImportResponse!
+}

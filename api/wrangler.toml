@@ -1,0 +1,34 @@
+# Cloudflare Workers Configuration
+# See: https://developers.cloudflare.com/workers/wrangler/configuration/
+
+name = "recipe-saver-api"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# Environment variables (non-sensitive)
+[vars]
+ENVIRONMENT = "development"
+
+# D1 Database Binding
+# Run `wrangler d1 create recipe-saver` to create the database
+# Then update the database_id below with the ID from the output
+[[d1_databases]]
+binding = "DB"  # This will be available as env.DB in your Worker
+database_name = "recipe-saver"
+database_id = "0cc826e0-efdc-4024-a238-d3bec14eb6d1"
+
+# Production environment overrides
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+# Staging environment (optional)
+[env.staging]
+vars = { ENVIRONMENT = "staging" }
+
+# Build configuration
+[build]
+command = ""  # No build step needed for plain JS
+
+# Workers configuration
+[observability]
+enabled = true  # Enable observability features
