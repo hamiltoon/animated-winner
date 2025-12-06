@@ -1,7 +1,7 @@
 // Database storage module using GraphQL API with SQLite backend
 // All operations call the GraphQL backend server
 
-const GRAPHQL_URL = 'http://localhost:4000/graphql';
+const GRAPHQL_URL = 'https://recipe-saver-api.hamiltoon.workers.dev/graphql';
 
 const RecipeStorage = {
   // Helper function to make GraphQL calls
