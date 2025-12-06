@@ -40,7 +40,17 @@ export function createResolvers(db, env) {
     Query: {
       health: () => 'Recipe Saver GraphQL API is running on Cloudflare Workers',
 
-      recipes: async () => {
+      recipes: async (_, __, context) => {
+        // Require authentication to view recipes
+        const userId = await getUserFromToken(
+          context.request.headers.get('Authorization'),
+          env.JWT_SECRET
+        );
+
+        if (!userId) {
+          throw new Error('Authentication required');
+        }
+
         const result = await db.prepare('SELECT * FROM recipes ORDER BY dateAdded DESC').all();
 
         return result.results.map(row => ({
@@ -81,7 +91,17 @@ export function createResolvers(db, env) {
         }));
       },
 
-      stats: async () => {
+      stats: async (_, __, context) => {
+        // Require authentication to view stats
+        const userId = await getUserFromToken(
+          context.request.headers.get('Authorization'),
+          env.JWT_SECRET
+        );
+
+        if (!userId) {
+          throw new Error('Authentication required');
+        }
+
         const countResult = await db.prepare('SELECT COUNT(*) as count FROM recipes').first();
         const categoriesResult = await db.prepare('SELECT DISTINCT category FROM recipes WHERE category != ""').all();
         const cuisinesResult = await db.prepare('SELECT DISTINCT cuisine FROM recipes WHERE cuisine != ""').all();

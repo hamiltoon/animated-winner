@@ -3,11 +3,19 @@ let allRecipes = [];
 let filteredRecipes = [];
 
 async function fetchGraphQL(query, variables = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+
+    // Add auth token if available
+    const token = auth.getToken();
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(API_URL, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ query, variables }),
     });
 
@@ -252,7 +260,22 @@ async function initializeAuth() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await initializeAuth();
-    loadRecipes();
+
+    // Only load recipes if authenticated
+    if (auth.isAuthenticated()) {
+        loadRecipes();
+    } else {
+        // Show message to sign in
+        const loading = document.getElementById('loading');
+        const emptyState = document.getElementById('emptyState');
+        const emptyStateH2 = emptyState.querySelector('h2');
+        const emptyStateP = emptyState.querySelector('p');
+
+        loading.style.display = 'none';
+        emptyState.style.display = 'block';
+        emptyStateH2.textContent = 'Sign in to view recipes';
+        emptyStateP.textContent = 'Please sign in with GitHub to access your recipe collection';
+    }
 
     document.getElementById('searchInput').addEventListener('input', filterRecipes);
     document.getElementById('categoryFilter').addEventListener('change', filterRecipes);
