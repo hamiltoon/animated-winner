@@ -218,7 +218,41 @@ function filterRecipes() {
     displayRecipes(filteredRecipes);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize auth UI
+async function initializeAuth() {
+    const signInButton = document.getElementById('signInButton');
+    const userProfile = document.getElementById('userProfile');
+    const userAvatar = document.getElementById('userAvatar');
+    const userName = document.getElementById('userName');
+
+    if (auth.isAuthenticated()) {
+        try {
+            const user = await auth.getCurrentUser();
+            if (user) {
+                // Show user profile, hide sign in button
+                signInButton.style.display = 'none';
+                userProfile.style.display = 'flex';
+                userAvatar.src = user.avatarUrl;
+                userName.textContent = user.username;
+            } else {
+                // Invalid token, show sign in button
+                signInButton.style.display = 'flex';
+                userProfile.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error loading user:', error);
+            signInButton.style.display = 'flex';
+            userProfile.style.display = 'none';
+        }
+    } else {
+        // Not authenticated, show sign in button
+        signInButton.style.display = 'flex';
+        userProfile.style.display = 'none';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await initializeAuth();
     loadRecipes();
 
     document.getElementById('searchInput').addEventListener('input', filterRecipes);
