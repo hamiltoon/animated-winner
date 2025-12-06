@@ -4,6 +4,9 @@ let allRecipes = [];
 let filteredRecipes = [];
 
 async function fetchGraphQL(query, variables = {}) {
+    console.log('[DEBUG] fetchGraphQL: Making request to', API_URL);
+    console.log('[DEBUG] fetchGraphQL: Query:', query.substring(0, 100) + '...');
+
     const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
@@ -12,9 +15,13 @@ async function fetchGraphQL(query, variables = {}) {
         body: JSON.stringify({ query, variables }),
     });
 
+    console.log('[DEBUG] fetchGraphQL: Response status:', response.status);
+
     const result = await response.json();
+    console.log('[DEBUG] fetchGraphQL: Response data:', result);
 
     if (result.errors) {
+        console.error('[ERROR] fetchGraphQL: GraphQL errors:', result.errors);
         throw new Error(result.errors[0].message);
     }
 
@@ -22,12 +29,21 @@ async function fetchGraphQL(query, variables = {}) {
 }
 
 async function loadRecipes() {
+    console.log('[DEBUG] loadRecipes: Starting');
     const loading = document.getElementById('loading');
     const error = document.getElementById('error');
     const recipesContainer = document.getElementById('recipes');
     const emptyState = document.getElementById('emptyState');
 
+    console.log('[DEBUG] loadRecipes: DOM elements found:', {
+        loading: !!loading,
+        error: !!error,
+        recipesContainer: !!recipesContainer,
+        emptyState: !!emptyState
+    });
+
     try {
+        console.log('[DEBUG] loadRecipes: Showing loading spinner');
         loading.style.display = 'block';
         error.style.display = 'none';
         emptyState.style.display = 'none';
@@ -60,21 +76,27 @@ async function loadRecipes() {
             }
         `;
 
+        console.log('[DEBUG] loadRecipes: Calling fetchGraphQL');
         const data = await fetchGraphQL(query);
+        console.log('[DEBUG] loadRecipes: Received data:', data);
 
         allRecipes = data.recipes || [];
         filteredRecipes = [...allRecipes];
+        console.log('[DEBUG] loadRecipes: Processed recipes count:', allRecipes.length);
 
         updateStats(data.stats);
         updateFilters(data.stats);
         displayRecipes(filteredRecipes);
 
+        console.log('[DEBUG] loadRecipes: Hiding loading spinner');
         loading.style.display = 'none';
 
         if (filteredRecipes.length === 0) {
             emptyState.style.display = 'block';
         }
+        console.log('[DEBUG] loadRecipes: Complete');
     } catch (err) {
+        console.error('[ERROR] loadRecipes: Error occurred:', err);
         loading.style.display = 'none';
         error.style.display = 'block';
         error.textContent = `Error loading recipes: ${err.message}`;
@@ -220,42 +242,74 @@ function filterRecipes() {
 
 // Initialize auth UI
 async function initializeAuth() {
+    console.log('[DEBUG] initializeAuth: Starting');
     const signInButton = document.getElementById('signInButton');
     const userProfile = document.getElementById('userProfile');
     const userAvatar = document.getElementById('userAvatar');
     const userName = document.getElementById('userName');
 
+    console.log('[DEBUG] initializeAuth: DOM elements found:', {
+        signInButton: !!signInButton,
+        userProfile: !!userProfile,
+        userAvatar: !!userAvatar,
+        userName: !!userName
+    });
+
+    console.log('[DEBUG] initializeAuth: Checking if authenticated');
     if (auth.isAuthenticated()) {
+        console.log('[DEBUG] initializeAuth: User is authenticated, fetching current user');
         try {
             const user = await auth.getCurrentUser();
+            console.log('[DEBUG] initializeAuth: Got user:', user);
             if (user) {
                 // Show user profile, hide sign in button
                 signInButton.style.display = 'none';
                 userProfile.style.display = 'flex';
                 userAvatar.src = user.avatarUrl;
                 userName.textContent = user.username;
+                console.log('[DEBUG] initializeAuth: User profile displayed');
             } else {
                 // Invalid token, show sign in button
                 signInButton.style.display = 'flex';
                 userProfile.style.display = 'none';
+                console.log('[DEBUG] initializeAuth: Invalid token, showing sign in button');
             }
         } catch (error) {
-            console.error('Error loading user:', error);
+            console.error('[ERROR] initializeAuth: Error loading user:', error);
             signInButton.style.display = 'flex';
             userProfile.style.display = 'none';
         }
     } else {
         // Not authenticated, show sign in button
+        console.log('[DEBUG] initializeAuth: Not authenticated, showing sign in button');
         signInButton.style.display = 'flex';
         userProfile.style.display = 'none';
     }
+    console.log('[DEBUG] initializeAuth: Complete');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await initializeAuth();
-    loadRecipes();
+    console.log('[DEBUG] DOMContentLoaded event fired');
+
+    try {
+        console.log('[DEBUG] Starting initializeAuth');
+        await initializeAuth();
+        console.log('[DEBUG] initializeAuth completed');
+    } catch (error) {
+        console.error('[ERROR] initializeAuth failed:', error);
+    }
+
+    try {
+        console.log('[DEBUG] Starting loadRecipes');
+        await loadRecipes();
+        console.log('[DEBUG] loadRecipes completed');
+    } catch (error) {
+        console.error('[ERROR] loadRecipes failed:', error);
+    }
 
     document.getElementById('searchInput').addEventListener('input', filterRecipes);
     document.getElementById('categoryFilter').addEventListener('change', filterRecipes);
     document.getElementById('cuisineFilter').addEventListener('change', filterRecipes);
+
+    console.log('[DEBUG] All initialization complete');
 });
