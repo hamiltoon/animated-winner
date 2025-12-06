@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test</h1>
+    <div id="status">Testing...</div>
+    <div id="result"></div>
+
+    <script>
+        const API_URL = 'https://recipe-saver-api.hamiltoon.workers.dev/graphql';
+
+        async function test() {
+            const statusDiv = document.getElementById('status');
+            const resultDiv = document.getElementById('result');
+
+            try {
+                statusDiv.textContent = 'Fetching recipes...';
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: `
+                            query {
+                                recipes {
+                                    id
+                                    title
+                                }
+                                stats {
+                                    totalRecipes
+                                }
+                            }
+                        `
+                    }),
+                });
+
+                statusDiv.textContent = 'Response received, parsing...';
+                const result = await response.json();
+
+                statusDiv.textContent = 'Success!';
+                resultDiv.innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            } catch (error) {
+                statusDiv.textContent = 'Error!';
+                resultDiv.textContent = 'Error: ' + error.message;
+                console.error(error);
+            }
+        }
+
+        test();
+    </script>
+</body>
+</html>
