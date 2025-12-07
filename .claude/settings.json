@@ -1,0 +1,46 @@
+{
+  "projectName": "Recipe Saver",
+  "description": "Full-stack recipe management application with React web app, Chrome extension, and GraphQL API",
+  "contextFiles": [
+    "README.md",
+    "web/src/App.jsx",
+    "web/src/lib/auth.js",
+    "web/src/lib/api.js",
+    "api/src/schema.graphql",
+    "api/src/resolvers.js"
+  ],
+  "excludePatterns": [
+    "node_modules/**",
+    "dist/**",
+    ".wrangler/**",
+    "*.db",
+    "*.log"
+  ],
+  "preferences": {
+    "codeStyle": {
+      "indent": 2,
+      "quotes": "single",
+      "semicolons": true,
+      "trailingComma": "es5"
+    },
+    "framework": "react",
+    "backend": "cloudflare-workers",
+    "database": "d1-sqlite",
+    "api": "graphql"
+  },
+  "environment": {
+    "webUrl": "https://hamiltoon.github.io/animated-winner/",
+    "apiUrl": "https://recipe-saver-api.hamiltoon.workers.dev/graphql",
+    "localWebPort": 5173,
+    "localApiPort": 8787
+  },
+  "tasks": {
+    "common": [
+      "Deploy web app to GitHub Pages",
+      "Deploy API to Cloudflare Workers",
+      "Test GraphQL mutations and queries",
+      "Update theme colors",
+      "Add new features to UI"
+    ]
+  }
+}
