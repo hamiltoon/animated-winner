@@ -1,7 +1,7 @@
 const API_URL = 'https://recipe-saver-api.hamiltoon.workers.dev/graphql';
 const GITHUB_CLIENT_ID = 'Ov23linhqwiqRIB7923L';
 const GITHUB_OAUTH_URL = 'https://github.com/login/oauth/authorize';
-const REDIRECT_URL = 'https://hamiltoon.github.io/animated-winner/auth/callback';
+const REDIRECT_URL = 'https://hamiltoon.github.io/animated-winner/';
 
 export const auth = {
   getToken() {
